@@ -27,7 +27,7 @@ public class DashboardService {
         // Basic statistics
         dashboardData.put("totalEmployees", userService.getTotalEmployeeCount());
         dashboardData.put("activeProjects", projectService.getTotalActiveProjectCount());
-        dashboardData.put("leaveRequestsThisMonth", leaveService.getLeaveRequestsCountThisMonth());
+        // dashboardData.put("leaveRequestsThisMonth", leaveService.getLeaveRequestsCountThisMonth());
         
         // Recent data
         dashboardData.put("pendingLeaves", leaveService.getPendingLeaves());
