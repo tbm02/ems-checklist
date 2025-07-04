@@ -101,6 +101,16 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>9.22.3</version>
+                <configuration>
+                    <url>jdbc:postgresql://localhost:5432/ems_db</url>
+                    <user>ems_user</user>
+                    <password>ems_password</password>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

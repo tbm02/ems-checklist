@@ -3,9 +3,9 @@ spring:
     name: employee-management-system
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/ems
-    username: postgres
-    password: root
+    url: jdbc:postgresql://localhost:5432/ems_db
+    username: ems_user
+    password: ems_password
     driver-class-name: org.postgresql.Driver
 
   jpa:

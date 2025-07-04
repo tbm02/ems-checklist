@@ -49,7 +49,11 @@ public class User implements UserDetails {
     private Role role;
     
     private String profilePicture;
-    
+
+    @Column(name = "first_login")
+    private boolean firstLogin = true;
+
+
     private boolean enabled = true;
     
     @Column(name = "created_at")
@@ -142,7 +146,15 @@ public class User implements UserDetails {
     
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-    
+    public boolean isFirstLogin() {
+        return firstLogin;
+    }
+
+    public void setFirstLogin(boolean firstLogin) {
+        this.firstLogin = firstLogin;
+    }
+
+
     public enum Role {
         ADMIN, EMPLOYEE
     }

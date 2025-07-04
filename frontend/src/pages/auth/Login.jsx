@@ -22,8 +22,13 @@ function Login() {
     try {
       const response = await login(credentials);
       const redirectPath =
-        response.role === "ADMIN" ? "/admin/dashboard" : "/employee/dashboard";
+        response.role === "ADMIN"
+          ? "/admin/dashboard"
+          : response.firstLogin
+          ? "/profile"
+          : "/employee/dashboard";
       navigate(redirectPath, { replace: true });
+
     } catch (error) {
       setError("Invalid username or password");
     } finally {

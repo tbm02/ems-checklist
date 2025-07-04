@@ -41,6 +41,12 @@ public class AuthService {
         );
         
         User user = (User) authentication.getPrincipal();
+
+        boolean isFirstLogin = user.isFirstLogin();
+        if (isFirstLogin) {
+            user.setFirstLogin(false);
+            userRepository.save(user); // 👈 Persist update
+        }
         
         // Generate JWT token with user role
         Map<String, Object> claims = new HashMap<>();
@@ -49,7 +55,7 @@ public class AuthService {
         
         String token = jwtUtil.generateToken(user, claims);
         
-        return new LoginResponse(token, user.getUsername(), user.getRole().name(), user.getId());
+        return new LoginResponse(token, user.getUsername(), user.getRole().name(), user.getId(),user.isFirstLogin());
     }
     
     public User register(RegisterRequest registerRequest) {
