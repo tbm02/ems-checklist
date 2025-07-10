@@ -30,28 +30,47 @@ public class AuthService {
     
     @Autowired
     private JwtUtil jwtUtil;
-    
+
     public LoginResponse login(LoginRequest loginRequest) {
-        // Authenticate user
+        // Step 1: Authenticate the user using Spring Security
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
-                loginRequest.getPassword()
-            )
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
         );
-        
+
+        // Step 2: Extract authenticated User
         User user = (User) authentication.getPrincipal();
-        
-        // Generate JWT token with user role
+
+        // Step 3: Capture original firstLogin before changing it
+        boolean isFirstLogin = user.isFirstLogin();
+
+        // Step 4: If first login, mark it false for future logins
+        if (isFirstLogin) {
+            user.setFirstLogin(false);
+            userRepository.save(user); // Persist the change
+        }
+
+        // Step 5: Generate JWT token and include useful claims
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRole().name());
         claims.put("userId", user.getId());
-        
+        claims.put("firstLogin", isFirstLogin); // Optional: include in JWT too
+
         String token = jwtUtil.generateToken(user, claims);
-        
-        return new LoginResponse(token, user.getUsername(), user.getRole().name(), user.getId());
+
+        // Step 6: Return LoginResponse with correct firstLogin value
+        return new LoginResponse(
+                token,
+                user.getUsername(),
+                user.getRole().name(),
+                user.getId(),
+                isFirstLogin // ✅ Return the captured value
+        );
     }
-    
+
+
     public User register(RegisterRequest registerRequest) {
         // Check if username or email already exists
         if (userRepository.existsByUsername(registerRequest.getUsername())) {

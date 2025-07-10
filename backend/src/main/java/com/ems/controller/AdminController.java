@@ -8,6 +8,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import com.ems.dto.RegisterRequest;
+
 
 import java.util.List;
 
@@ -40,7 +43,14 @@ public class AdminController {
     
     @Autowired
     private DashboardService dashboardService;
-    
+
+    @PostMapping("/users/register")
+    public ResponseEntity<String> registerUser(@RequestBody @Valid RegisterRequest request) {
+        userService.registerUserAsAdmin(request);
+        return ResponseEntity.ok("User registered successfully.");
+    }
+
+
     // Leave Management
     @GetMapping("/leaves")
     public ResponseEntity<List<Leave>> getAllLeaves() {

@@ -21,15 +21,23 @@ function Login() {
 
     try {
       const response = await login(credentials);
-      const redirectPath =
-        response.role === "ADMIN" ? "/admin/dashboard" : "/employee/dashboard";
+      let redirectPath;
+      if (response.role === "ADMIN") {
+        redirectPath = "/admin/dashboard";
+      } else {
+        redirectPath = response.firstLogin ? "/profile" : "/employee/dashboard";
+      }
       navigate(redirectPath, { replace: true });
+
+        console.log("Login response:", response);
+
     } catch (error) {
       setError("Invalid username or password");
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleChange = (e) => {
     setCredentials({

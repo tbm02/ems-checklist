@@ -25,9 +25,9 @@ export function AuthProvider({ children }) {
   const login = async (credentials) => {
     try {
       const response = await authService.login(credentials);
-      const { token, username, role, userId } = response.data;
+      const { token, username, role, userId , firstLogin } = response.data;
 
-      const userData = { username, role, userId };
+      const userData = { username, role, userId,firstLogin };
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(userData));

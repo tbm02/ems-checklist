@@ -14,6 +14,7 @@ import LoadingSpinner from "./components/LoadingSpinner";
 
 function App() {
   const { user, loading } = useAuth();
+  console.log(user)
 
   if (loading) {
     return <LoadingSpinner />;
@@ -24,9 +25,22 @@ function App() {
       <Route
         path="/login"
         element={
-          !user ? <Login /> : <Navigate to={getDefaultRoute(user.role)} />
+          !user ? (
+            <Login />
+          ) : (
+            <Navigate
+              to={
+                user.role === "ADMIN"
+                  ? "/admin/dashboard"
+                  : user.firstLogin
+                  ? "/profile"
+                  : "/employee/dashboard"
+              }
+            />
+          )
         }
       />
+
 
       {user ? (
         <Route path="/" element={<Layout />}>
@@ -40,7 +54,16 @@ function App() {
             </>
           ) : (
             <>
-              <Route index element={<Navigate to="/employee/dashboard" />} />
+             <Route
+                      index
+                      element={
+                        user.firstLogin ? (
+                          <Navigate to="/profile" />
+                        ) : (
+                          <Navigate to="/employee/dashboard" />
+                        )
+                      }
+                    />
               <Route
                 path="employee/dashboard"
                 element={<EmployeeDashboard />}
