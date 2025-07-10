@@ -11,12 +11,12 @@ public class LoginResponse {
 
     public LoginResponse() {}
     
-    public LoginResponse(String token, String username, String role, Long userId) {
-        this.token = token;
-        this.username = username;
-        this.role = role;
-        this.userId = userId;
-    }
+//    public LoginResponse(String token, String username, String role, Long userId) {
+//        this.token = token;
+//        this.username = username;
+//        this.role = role;
+//        this.userId = userId;
+//    }
 
     public LoginResponse(String token, String username, String role, Long userId, boolean firstLogin) {
         this.token = token;

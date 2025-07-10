@@ -25,9 +25,22 @@ function App() {
       <Route
         path="/login"
         element={
-          !user ? <Login /> : <Navigate to={getDefaultRoute(user.role)} />
+          !user ? (
+            <Login />
+          ) : (
+            <Navigate
+              to={
+                user.role === "ADMIN"
+                  ? "/admin/dashboard"
+                  : user.firstLogin
+                  ? "/profile"
+                  : "/employee/dashboard"
+              }
+            />
+          )
         }
       />
+
 
       {user ? (
         <Route path="/" element={<Layout />}>
