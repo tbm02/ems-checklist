@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Users, FolderOpen, Calendar, Clock } from "lucide-react";
 import { dashboardService } from "../../services/apiService";
+import CreateEmployeeModal from "../../components/CreateEmployeeModal";
 
 function AdminDashboard() {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [showModal, setShowModal] = useState(false); 
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -19,6 +20,11 @@ function AdminDashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEmployeeCreated = () => {
+    setShowModal(false);
+    fetchDashboardData(); // refresh dashboard after new employee added
   };
 
   if (loading) {
@@ -138,12 +144,22 @@ function AdminDashboard() {
             Quick Actions
           </h3>
           <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button className="btn btn-primary">Create New Employee</button>
+            <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+              Create New Employee
+            </button>
             <button className="btn btn-secondary">Add New Project</button>
             <button className="btn btn-secondary">Create Announcement</button>
           </div>
         </div>
       </div>
+
+      {/* Modal Mount */}
+      {showModal && (
+        <CreateEmployeeModal
+          onClose={() => setShowModal(false)}
+          onSuccess={handleEmployeeCreated}
+        />
+      )}
     </div>
   );
 }
