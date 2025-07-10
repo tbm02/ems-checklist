@@ -12,7 +12,7 @@ import java.util.List;
 
 @Service
 public class UserService {
-    
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -75,4 +75,16 @@ public class UserService {
 
         userRepository.save(newUser);
     }
+
+    public void changePassword(Long userId, String oldPassword, String newPassword) {
+        User user = getUserById(userId);
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("Old password is incorrect.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
 } 

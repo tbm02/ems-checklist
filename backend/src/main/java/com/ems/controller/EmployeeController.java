@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import com.ems.dto.ChangePasswordRequest;
+
 
 import java.util.List;
 
@@ -130,6 +132,16 @@ public class EmployeeController {
     @GetMapping("/announcements")
     public ResponseEntity<List<Announcement>> getAnnouncements() {
         return ResponseEntity.ok(announcementService.getActiveAnnouncements());
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        userService.changePassword(user.getId(), request.getOldPassword(), request.getNewPassword());
+
+        return ResponseEntity.ok("Password changed successfully.");
     }
     
     // TODO: Add resignation endpoints
