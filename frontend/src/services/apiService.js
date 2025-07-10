@@ -18,6 +18,8 @@ export const userService = {
     updateProfile: (userData) => api.put('/employee/profile', userData),
     getAllEmployees: () => api.get('/admin/employees'),
     getEmployee: (employeeId) => api.get(`/admin/employees/${employeeId}`),
+    registerUser: (userData) => api.post('/admin/users/register', userData),
+
 }
 
 export const projectService = {
