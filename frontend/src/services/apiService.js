@@ -19,7 +19,7 @@ export const userService = {
     getAllEmployees: () => api.get('/admin/employees'),
     getEmployee: (employeeId) => api.get(`/admin/employees/${employeeId}`),
     registerUser: (userData) => api.post('/admin/users/register', userData),
-
+    changePassword: (passwordData) => api.put('/employee/change-password', passwordData),
 }
 
 export const projectService = {
