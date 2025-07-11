@@ -12,11 +12,9 @@ function AdminDashboard() {
   }, []);
 
   const fetchDashboardData = async () => {
-    console.log("Fetching admin dashboard data...");
     try {
       const response = await dashboardService.getAdminDashboard();
       setDashboardData(response.data);
-      console.log("Dashboard Data:", response.data);  
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     } finally {
