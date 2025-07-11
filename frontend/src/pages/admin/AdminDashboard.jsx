@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { Users, FolderOpen, Calendar, Clock } from "lucide-react";
 import { dashboardService } from "../../services/apiService";
 import CreateEmployeeModal from "../../components/CreateEmployeeModal";
+import { useNavigate } from "react-router-dom";
 
 function AdminDashboard() {
+  const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false); 
@@ -147,7 +149,7 @@ function AdminDashboard() {
             <button className="btn btn-primary" onClick={() => setShowModal(true)}>
               Create New Employee
             </button>
-            <button className="btn btn-secondary">Add New Project</button>
+            <button className="btn btn-secondary" onClick={()=>navigate("/admin/createworkflow")}>Create Workflow</button>
             <button className="btn btn-secondary">Create Announcement</button>
           </div>
         </div>
