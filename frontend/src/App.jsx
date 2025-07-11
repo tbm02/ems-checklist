@@ -11,6 +11,7 @@ import MyProjects from "./pages/employee/MyProjects";
 import Policies from "./pages/employee/Policies";
 import Profile from "./pages/employee/Profile";
 import LoadingSpinner from "./components/LoadingSpinner";
+import CreateWorkFlow from "./pages/admin/CreateWorkflow";
 
 function App() {
   const { user, loading } = useAuth();
@@ -51,6 +52,7 @@ function App() {
               <Route path="admin/leaves" element={<LeaveManagement />} />
               <Route path="admin/employees" element={<EmployeeManagement />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="admin/createworkflow" element={<CreateWorkFlow />} />
             </>
           ) : (
             <>
