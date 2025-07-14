@@ -7,8 +7,8 @@ import {
   FileText,
   FolderOpen,
   User,
-  Settings,
   LogOut,
+  Check,
 } from "lucide-react";
 
 function Sidebar() {
@@ -19,7 +19,8 @@ function Sidebar() {
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Leave Management", href: "/admin/leaves", icon: Calendar },
     { name: "Employee Management", href: "/admin/employees", icon: Users },
-    { name: "Profile", href: "/profile", icon: User },
+    // { name: "Profile", href: "/profile", icon: User },
+    { name: "Check Status", href:"admin/workflowoverview", icon: Check },
   ];
 
   const employeeNavItems = [
