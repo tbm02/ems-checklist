@@ -12,11 +12,11 @@ public class ChecklistStepStatus {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "assignment_id")
+    @JoinColumn(name = "assignment_id", nullable = false)
     private ChecklistAssignment assignment;
 
     @ManyToOne
-    @JoinColumn(name = "step_id")
+    @JoinColumn(name = "step_id", nullable = false)
     private ChecklistStep step;
 
     private String status = "PENDING";
@@ -37,5 +37,72 @@ public class ChecklistStepStatus {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
-    // Getters and setters
+
+    public Long getId() {
+        return id;
+    }
+
+    public ChecklistAssignment getAssignment() {
+        return assignment;
+    }
+
+    public void setAssignment(ChecklistAssignment assignment) {
+        this.assignment = assignment;
+    }
+
+    public ChecklistStep getStep() {
+        return step;
+    }
+
+    public void setStep(ChecklistStep step) {
+        this.step = step;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public String getAttachmentPath() {
+        return attachmentPath;
+    }
+
+    public void setAttachmentPath(String attachmentPath) {
+        this.attachmentPath = attachmentPath;
+    }
+
+    public User getAssignedTo() {
+        return assignedTo;
+    }
+
+    public void setAssignedTo(User assignedTo) {
+        this.assignedTo = assignedTo;
+    }
+
+    public User getCompletedBy() {
+        return completedBy;
+    }
+
+    public void setCompletedBy(User completedBy) {
+        this.completedBy = completedBy;
+    }
+
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(LocalDateTime completedAt) {
+        this.completedAt = completedAt;
+    }
 }

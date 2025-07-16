@@ -12,23 +12,68 @@ public class ChecklistStep {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "template_id")
+    @JoinColumn(name = "template_id", nullable = false)
     private ChecklistTemplate template;
 
-    @Column(name = "step_name")
     private String stepName;
 
-    @Column(name = "step_description")
     private String stepDescription;
 
-    @Column(name = "step_order")
     private Integer stepOrder;
 
-    @Column(name = "role_responsible")
     private String roleResponsible;
 
-    @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Getters and setters
+    public Long getId() {
+        return id;
+    }
+
+    public ChecklistTemplate getTemplate() {
+        return template;
+    }
+
+    public void setTemplate(ChecklistTemplate template) {  // THIS IS WHAT YOU NEED
+        this.template = template;
+    }
+
+    public String getStepName() {
+        return stepName;
+    }
+
+    public void setStepName(String stepName) {
+        this.stepName = stepName;
+    }
+
+    public String getStepDescription() {
+        return stepDescription;
+    }
+
+    public void setStepDescription(String stepDescription) {
+        this.stepDescription = stepDescription;
+    }
+
+    public Integer getStepOrder() {
+        return stepOrder;
+    }
+
+    public void setStepOrder(Integer stepOrder) {
+        this.stepOrder = stepOrder;
+    }
+
+    public String getRoleResponsible() {
+        return roleResponsible;
+    }
+
+    public void setRoleResponsible(String roleResponsible) {
+        this.roleResponsible = roleResponsible;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }

@@ -2,7 +2,6 @@ package com.ems.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "checklist_templates")
@@ -16,23 +15,60 @@ public class ChecklistTemplate {
 
     private String description;
 
-    @Column(name = "priority")
     @Enumerated(EnumType.STRING)
-    private Priority priority = Priority.MEDIUM;
+    private Priority priority;
 
     @ManyToOne
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-    @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    @OneToMany(mappedBy = "template", cascade = CascadeType.ALL)
-    private List<ChecklistStep> steps;
 
     public enum Priority {
         HIGH, MEDIUM, LOW
     }
 
-    // Getters and setters
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {  // THIS is what you're missing
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Priority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }

@@ -1,17 +1,17 @@
 -- Checklist Template Table
 CREATE TABLE checklist_templates (
-  id SERIAL PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
   description TEXT,
-  created_by INTEGER REFERENCES users(id),
+  created_by BIGINT REFERENCES users(id),
   priority VARCHAR(10) CHECK (priority IN ('HIGH', 'MEDIUM', 'LOW')) DEFAULT 'MEDIUM',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Checklist Steps Table
 CREATE TABLE checklist_steps (
-  id SERIAL PRIMARY KEY,
-  template_id INTEGER REFERENCES checklist_templates(id) ON DELETE CASCADE,
+  id BIGSERIAL PRIMARY KEY,
+  template_id BIGINT REFERENCES checklist_templates(id) ON DELETE CASCADE,
   step_name VARCHAR(100) NOT NULL,
   step_description TEXT,
   step_order INTEGER NOT NULL,
@@ -21,9 +21,9 @@ CREATE TABLE checklist_steps (
 
 -- Checklist Assignment Table
 CREATE TABLE checklist_assignments (
-  id SERIAL PRIMARY KEY,
-  template_id INTEGER REFERENCES checklist_templates(id),
-  assigned_to_id INTEGER REFERENCES users(id),
+  id BIGSERIAL PRIMARY KEY,
+  template_id BIGINT REFERENCES checklist_templates(id),
+  assigned_to_id BIGINT REFERENCES users(id),
   status VARCHAR(20) DEFAULT 'IN_PROGRESS',
   assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   completed_at TIMESTAMP
@@ -31,13 +31,13 @@ CREATE TABLE checklist_assignments (
 
 -- Checklist Step Status Table
 CREATE TABLE checklist_step_status (
-  id SERIAL PRIMARY KEY,
-  assignment_id INTEGER REFERENCES checklist_assignments(id) ON DELETE CASCADE,
-  step_id INTEGER REFERENCES checklist_steps(id),
+  id BIGSERIAL PRIMARY KEY,
+  assignment_id BIGINT REFERENCES checklist_assignments(id) ON DELETE CASCADE,
+  step_id BIGINT REFERENCES checklist_steps(id),
   status VARCHAR(20) DEFAULT 'PENDING',
   remarks TEXT,
   attachment_path TEXT,
-  assigned_to_id INTEGER REFERENCES users(id),
-  completed_by INTEGER REFERENCES users(id),
+  assigned_to_id BIGINT REFERENCES users(id),
+  completed_by BIGINT REFERENCES users(id),
   completed_at TIMESTAMP
 );
