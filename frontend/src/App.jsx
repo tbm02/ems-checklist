@@ -11,7 +11,8 @@ import MyProjects from "./pages/employee/MyProjects";
 import Policies from "./pages/employee/Policies";
 import Profile from "./pages/employee/Profile";
 import LoadingSpinner from "./components/LoadingSpinner";
-import CreateWorkFlow from "./pages/admin/CreateWorkflow";
+import CreateTemplate from "./pages/admin/CreateTemplate";
+import AssignSteps from "./pages/admin/AssignSteps";
 import WorkflowOverview from "./components/WorkflowOverview";
 
 function App() {
@@ -53,7 +54,8 @@ function App() {
               <Route path="admin/leaves" element={<LeaveManagement />} />
               <Route path="admin/employees" element={<EmployeeManagement />} />
               <Route path="profile" element={<Profile />} />
-              <Route path="admin/createworkflow" element={<CreateWorkFlow />} />
+              <Route path="admin/create-template" element={<CreateTemplate />} />
+              <Route path="admin/assign-steps" element={<AssignSteps />} />
               <Route path="admin/workflowoverview" element={<WorkflowOverview />} />
 
             </>

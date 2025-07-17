@@ -60,4 +60,11 @@ export const announcementService = {
     createAnnouncement: (announcementData) => api.post('/admin/announcements', announcementData),
     updateAnnouncement: (announcementId, announcementData) => api.put(`/admin/announcements/${announcementId}`, announcementData),
     deleteAnnouncement: (announcementId) => api.delete(`/admin/announcements/${announcementId}`),
-} 
+}
+
+export const templateService = {
+    getTemplates: () => api.get('/templates'),
+    getTemplate: (id) => api.get(`/templates/${id}`),
+    assignSteps: (id, assignments) => api.post(`/templates/${id}/assign`, { assignments }),
+    createTemplate: (data) => api.post('/templates', data),
+}; 

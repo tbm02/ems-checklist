@@ -8,6 +8,7 @@ import com.ems.repository.ChecklistStepRepository;
 import com.ems.repository.ChecklistAssignmentRepository;
 import com.ems.repository.ChecklistStepStatusRepository;
 import com.ems.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -92,4 +93,16 @@ public class ChecklistService {
 
         return assignment;
     }
+
+    @Transactional
+
+    public List<ChecklistTemplate> getAllTemplates() {
+        return templateRepository.findAll();
+    }
+
+    public ChecklistTemplate getTemplateById(Long id) {
+        return templateRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Template not found with id " + id));
+    }
+
 }

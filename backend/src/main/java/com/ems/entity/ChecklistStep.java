@@ -1,5 +1,6 @@
 package com.ems.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -13,6 +14,7 @@ public class ChecklistStep {
 
     @ManyToOne
     @JoinColumn(name = "template_id", nullable = false)
+    @JsonIgnoreProperties("steps")
     private ChecklistTemplate template;
 
     private String stepName;
