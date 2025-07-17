@@ -149,8 +149,8 @@ function AdminDashboard() {
             <button className="btn btn-primary" onClick={() => setShowModal(true)}>
               Create New Employee
             </button>
-            <button className="btn btn-secondary" onClick={()=>navigate("/admin/createworkflow")}>Create Workflow</button>
-            <button className="btn btn-secondary">Create Announcement</button>
+            <button className="btn btn-secondary" onClick={()=>navigate("/admin/create-template")}>Create Workflow</button>
+            <button className="btn btn-secondary" onClick={()=>navigate("/admin/assign-steps")}>Initialise Workflow</button>
           </div>
         </div>
       </div>
