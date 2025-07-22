@@ -1,6 +1,9 @@
 package com.ems.entity;
 
+import com.ems.enums.StepStatus;
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,7 +22,9 @@ public class ChecklistStepStatus {
     @JoinColumn(name = "step_id", nullable = false)
     private ChecklistStep step;
 
-    private String status = "PENDING";
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private StepStatus status;
 
     private String remarks;
 
@@ -37,6 +42,10 @@ public class ChecklistStepStatus {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    @Column(name = "due_date")
+    private LocalDate dueDate;
+
+    // Getters and Setters
 
     public Long getId() {
         return id;
@@ -58,11 +67,11 @@ public class ChecklistStepStatus {
         this.step = step;
     }
 
-    public String getStatus() {
+    public StepStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StepStatus status) {
         this.status = status;
     }
 
@@ -104,5 +113,13 @@ public class ChecklistStepStatus {
 
     public void setCompletedAt(LocalDateTime completedAt) {
         this.completedAt = completedAt;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
     }
 }

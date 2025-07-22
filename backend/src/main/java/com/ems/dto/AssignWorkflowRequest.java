@@ -1,11 +1,13 @@
 package com.ems.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class AssignWorkflowRequest {
     private Long templateId;
     private Long assignedToUserId;
     private List<StepAssignment> stepAssignments;
+
 
     public Long getTemplateId() {
         return templateId;
@@ -34,6 +36,7 @@ public class AssignWorkflowRequest {
     public static class StepAssignment {
         private Long stepId;
         private Long assignedTo;
+        private LocalDate dueDate;
 
         public Long getStepId() {
             return stepId;
@@ -50,5 +53,8 @@ public class AssignWorkflowRequest {
         public void setAssignedTo(Long assignedTo) {
             this.assignedTo = assignedTo;
         }
+
+        public LocalDate getDueDate() { return dueDate; }
+        public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
     }
 }

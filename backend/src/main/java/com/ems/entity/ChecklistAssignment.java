@@ -2,6 +2,7 @@ package com.ems.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "checklist_assignments")
@@ -20,6 +21,18 @@ public class ChecklistAssignment {
     private User assignedTo;
 
     private String status = "IN_PROGRESS";
+
+    @OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ChecklistStepStatus> stepStatuses;
+
+    public List<ChecklistStepStatus> getStepStatuses() {
+        return stepStatuses;
+    }
+
+    public void setStepStatuses(List<ChecklistStepStatus> stepStatuses) {
+        this.stepStatuses = stepStatuses;
+    }
+
 
     @Column(name = "assigned_at")
     private LocalDateTime assignedAt = LocalDateTime.now();

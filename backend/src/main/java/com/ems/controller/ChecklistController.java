@@ -1,13 +1,12 @@
 package com.ems.controller;
 
-import com.ems.dto.AssignWorkflowRequest;
-import com.ems.dto.ChecklistTemplateDTO;
-import com.ems.dto.CreateWorkflowRequest;
+import com.ems.dto.*;
 import com.ems.entity.ChecklistAssignment;
 import com.ems.entity.ChecklistTemplate;
 import com.ems.entity.User;
 import com.ems.repository.ChecklistTemplateRepository;
 import com.ems.service.ChecklistService;
+import com.ems.service.WorkflowStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +23,9 @@ public class ChecklistController {
     private ChecklistService checklistService;
     @Autowired
     private ChecklistTemplateRepository checklistTemplateRepository;
+
+    @Autowired
+    private WorkflowStatusService workflowStatusService;
 
 
     @PostMapping
@@ -54,8 +56,18 @@ public class ChecklistController {
         ChecklistTemplate template = checklistService.getTemplateById(id);
         ChecklistTemplateDTO response = new ChecklistTemplateDTO(template);
         return ResponseEntity.ok(response);
-}
+    }
 
+    @GetMapping("/status")
+    public ResponseEntity<WorkflowOverviewDTO> getWorkflowStatus() {
+        return ResponseEntity.ok(workflowStatusService.getWorkflowOverview());
+    }
+
+    @GetMapping("/report/{assignmentId}")
+    public ResponseEntity<WorkflowReportDTO> getWorkflowReport(@PathVariable Long assignmentId) {
+        WorkflowReportDTO report = checklistService.getWorkflowReport(assignmentId);
+        return ResponseEntity.ok(report);
+    }
 
 
 

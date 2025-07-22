@@ -158,6 +158,11 @@ public class User implements UserDetails {
         this.firstLogin = firstLogin;
     }
 
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
+
 
     public enum Role {
         ADMIN, EMPLOYEE

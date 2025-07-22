@@ -3,6 +3,7 @@ package com.ems.service;
 import com.ems.dto.AssignWorkflowRequest;
 import com.ems.dto.CreateWorkflowRequest;
 import com.ems.entity.*;
+import com.ems.enums.StepStatus;
 import com.ems.repository.ChecklistTemplateRepository;
 import com.ems.repository.ChecklistStepRepository;
 import com.ems.repository.ChecklistAssignmentRepository;
@@ -11,6 +12,8 @@ import com.ems.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.ems.dto.WorkflowReportDTO;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -86,9 +89,11 @@ public class ChecklistService {
             stepStatus.setAssignment(assignment);
             stepStatus.setStep(step);
             stepStatus.setAssignedTo(stepUser);
-            stepStatus.setStatus("PENDING");
+            stepStatus.setStatus(StepStatus.PENDING);
+            stepStatus.setDueDate(stepRequest.getDueDate());
 
             checklistStepStatusRepository.save(stepStatus);
+
         }
 
         return assignment;
@@ -104,5 +109,33 @@ public class ChecklistService {
         return templateRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Template not found with id " + id));
     }
+
+    public WorkflowReportDTO getWorkflowReport(Long assignmentId) {
+        ChecklistAssignment assignment = checklistAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new RuntimeException("Assignment not found"));
+
+        WorkflowReportDTO report = new WorkflowReportDTO();
+        report.setAssignmentId(assignment.getId());
+        report.setWorkflowName(assignment.getTemplate().getName());
+        report.setPriority(assignment.getTemplate().getPriority().name());
+        report.setAssignedTo(assignment.getAssignedTo().getFullName());
+        report.setAssignedDate(assignment.getAssignedAt().toLocalDate());
+
+        List<WorkflowReportDTO.StepReportDTO> steps = assignment.getStepStatuses().stream().map(stepStatus -> {
+            WorkflowReportDTO.StepReportDTO stepDTO = new WorkflowReportDTO.StepReportDTO();
+            stepDTO.setStepName(stepStatus.getStep().getStepName());
+            stepDTO.setStatus(stepStatus.getStatus().name());
+            stepDTO.setAssignedTo(stepStatus.getAssignedTo().getFullName());
+            stepDTO.setDueDate(stepStatus.getDueDate());
+            stepDTO.setCompletedAt(stepStatus.getCompletedAt());
+            stepDTO.setRemarks(stepStatus.getRemarks());
+            return stepDTO;
+        }).toList();
+
+        report.setSteps(steps);
+
+        return report;
+    }
+
 
 }
