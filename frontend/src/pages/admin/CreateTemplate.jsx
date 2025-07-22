@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import toast from "react-hot-toast";
 
 function CreateTemplate() {
@@ -9,7 +10,7 @@ function CreateTemplate() {
   const [stepForm, setStepForm] = useState({
     name: "",
     description: "",
-    sequence: steps.length + 1,
+    sequence: 1,
   });
   const [showStepForm, setShowStepForm] = useState(false);
 
@@ -24,13 +25,22 @@ function CreateTemplate() {
       toast.error("Please fill all step fields");
       return;
     }
-    setSteps([...steps, { ...stepForm, id: Date.now() }]);
-    setStepForm({ name: "", description: "", sequence: steps.length + 2 });
+
+    const newStep = {
+      stepName: stepForm.name,
+      stepDescription: stepForm.description,
+      stepOrder: stepForm.sequence,
+      roleResponsible: "General",
+    };
+
+    setSteps([...steps, newStep]);
+    setStepForm({ name: "", description: "", sequence: stepForm.sequence + 1 });
     setShowStepForm(false);
   };
 
-  const handleRemoveStep = (id) => {
-    setSteps(steps.filter((s) => s.id !== id));
+  const handleRemoveStep = (order) => {
+    const updated = steps.filter((s) => s.stepOrder !== order);
+    setSteps(updated);
   };
 
   const handleStepFormChange = (e) => {
@@ -38,19 +48,40 @@ function CreateTemplate() {
     setStepForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleTemplateSubmit = (e) => {
+  const handleTemplateSubmit = async (e) => {
     e.preventDefault();
     if (!title || !description || steps.length === 0) {
       toast.error("Please fill all template fields and add at least one step");
       return;
     }
-    // TODO: Call API to create template
-    toast.success("Template created!");
-    setTitle("");
-    setDescription("");
-    setPriority("MEDIUM");
-    setSteps([]);
-    setStepForm({ name: "", description: "", sequence: 1 });
+
+    const payload = {
+      name: title,
+      description: description,
+      priority: priority,
+      steps: steps,
+    };
+
+    const token = localStorage.getItem("token"); 
+
+    try {
+          const response = await axios.post("/api/admin/workflows", payload, {
+                headers: {
+                  Authorization: `Bearer ${token}`, 
+                  "Content-Type": "application/json"
+                }
+              });
+          toast.success("Template created successfully!");
+
+      setTitle("");
+      setDescription("");
+      setPriority("MEDIUM");
+      setSteps([]);
+      setStepForm({ name: "", description: "", sequence: 1 });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to create template");
+    }
   };
 
   return (
@@ -101,14 +132,14 @@ function CreateTemplate() {
             <label className="block font-medium mb-1">Steps:</label>
             <ul className="mb-2 space-y-2">
               {steps.map((step, idx) => (
-                <li key={step.id} className="flex items-center gap-2 bg-gray-50 rounded p-2">
-                  <span className="font-semibold">Step {idx + 1}:</span>
+                <li key={idx} className="flex items-center gap-2 bg-gray-50 rounded p-2">
+                  <span className="font-semibold">Step {step.stepOrder}:</span>
                   <span className="truncate max-w-xs">
-                    {step.name}, {step.description}
+                    {step.stepName}, {step.stepDescription}
                   </span>
                   <button
                     type="button"
-                    onClick={() => handleRemoveStep(step.id)}
+                    onClick={() => handleRemoveStep(step.stepOrder)}
                     className="ml-auto text-red-500 hover:underline"
                   >
                     Remove
@@ -129,6 +160,7 @@ function CreateTemplate() {
           </div>
         </form>
       </div>
+
       {/* Right: Step Form */}
       {showStepForm && (
         <div className="flex-1 border rounded-lg p-6 bg-gray-50">

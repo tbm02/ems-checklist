@@ -13,6 +13,25 @@ export const leaveService = {
     rejectLeave: (leaveId, reason) => api.put(`/admin/leaves/${leaveId}/reject?reason=${encodeURIComponent(reason)}`),
 }
 
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+};
+
+export const templateService = {
+  assignSteps: (data) => api.post('/admin/workflows/assign', data, getAuthHeaders()),
+  getTemplates: () => api.get('/admin/workflows', getAuthHeaders()),
+  getTemplate: (id) => api.get(`/admin/workflows/${id}`, getAuthHeaders()),
+  getAllWorkflowStatuses: () => api.get('/admin/workflows/status', getAuthHeaders()),
+  getWorkflowReport: (id) => api.get(`/admin/workflows/report/${id}`, getAuthHeaders()),
+};
+
+
+
 export const userService = {
     getProfile: () => api.get('/employee/profile'),
     updateProfile: (userData) => api.put('/employee/profile', userData),
@@ -62,9 +81,3 @@ export const announcementService = {
     deleteAnnouncement: (announcementId) => api.delete(`/admin/announcements/${announcementId}`),
 }
 
-export const templateService = {
-    getTemplates: () => api.get('/templates'),
-    getTemplate: (id) => api.get(`/templates/${id}`),
-    assignSteps: (id, assignments) => api.post(`/templates/${id}/assign`, { assignments }),
-    createTemplate: (data) => api.post('/templates', data),
-}; 

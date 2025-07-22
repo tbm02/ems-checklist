@@ -13,7 +13,8 @@ import Profile from "./pages/employee/Profile";
 import LoadingSpinner from "./components/LoadingSpinner";
 import CreateTemplate from "./pages/admin/CreateTemplate";
 import AssignSteps from "./pages/admin/AssignSteps";
-import WorkflowOverview from "./components/WorkflowOverview";
+import AdminWorkflowDashboard from "./components/AdminWorkflowDashboard";
+import WorkflowReport from "./pages/admin/WorkflowReport";
 
 function App() {
   const { user, loading } = useAuth();
@@ -56,7 +57,9 @@ function App() {
               <Route path="profile" element={<Profile />} />
               <Route path="admin/create-template" element={<CreateTemplate />} />
               <Route path="admin/assign-steps" element={<AssignSteps />} />
-              <Route path="admin/workflowoverview" element={<WorkflowOverview />} />
+              <Route path="admin/workflowoverview" element={<AdminWorkflowDashboard />} />
+              <Route path="/admin/workflows/report/:id" element={<WorkflowReport />} />
+
 
             </>
           ) : (

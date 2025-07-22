@@ -5,32 +5,26 @@ import toast from "react-hot-toast";
 function AssignSteps() {
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [steps, setSteps] = useState([]);
+  const [templateDetails, setTemplateDetails] = useState(null);
   const [users, setUsers] = useState([]);
-  const [assignments, setAssignments] = useState({}); // { stepId: { userId, dueDate } }
+  const [assignments, setAssignments] = useState({}); 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch templates
-    async function fetchTemplates() {
+    async function fetchInitialData() {
       try {
-        const res = await templateService.getTemplates();
-        setTemplates(res.data || []);
+        const [tplRes, userRes] = await Promise.all([
+          templateService.getTemplates(),
+          userService.getAllEmployees(),
+        ]);
+        setTemplates(tplRes.data || []);
+        setUsers(userRes.data || []);
       } catch (err) {
-        toast.error("Failed to load templates");
+        toast.error("Failed to load templates or users");
       }
     }
-    // Fetch users
-    async function fetchUsers() {
-      try {
-        const res = await userService.getAllEmployees();
-        setUsers(res.data || []);
-      } catch (err) {
-        toast.error("Failed to load users");
-      }
-    }
-    fetchTemplates();
-    fetchUsers();
+
+    fetchInitialData();
   }, []);
 
   const handleTemplateSelect = async (templateId) => {
@@ -38,10 +32,10 @@ function AssignSteps() {
     setLoading(true);
     try {
       const res = await templateService.getTemplate(templateId);
-      setSteps(res.data.steps || []);
+      setTemplateDetails(res.data);
       setAssignments({});
     } catch (err) {
-      toast.error("Failed to load template steps");
+      toast.error("Failed to load template details");
     } finally {
       setLoading(false);
     }
@@ -58,35 +52,57 @@ function AssignSteps() {
   };
 
   const handleAssign = async () => {
-    // Validate
-    for (const step of steps) {
-      if (!assignments[step.id] || !assignments[step.id].userId) {
-        toast.error("Assign all steps to users");
+    if (!templateDetails || !templateDetails.id) {
+      toast.error("No template selected");
+      return;
+    }
+
+    for (const step of templateDetails.steps || []) {
+      if (!assignments[step.id]?.userId) {
+        toast.error("Please assign all steps to users");
         return;
       }
     }
-    try {
-      setLoading(true);
-      // Call API to assign steps
-      await templateService.assignSteps(selectedTemplate, steps.map((step) => ({
+
+    const payload = {
+      templateId: templateDetails.id,
+      assignedToUserId: assignments[templateDetails.steps[0].id].userId, 
+      stepAssignments: templateDetails.steps.map((step) => ({
         stepId: step.id,
-        userId: assignments[step.id].userId,
+        assignedTo: Number(assignments[step.id].userId),
         dueDate: assignments[step.id].dueDate || null,
-      })));
-      toast.success("Steps assigned successfully");
-      setSelectedTemplate(null);
-      setSteps([]);
-      setAssignments({});
-    } catch (err) {
-      toast.error("Failed to assign steps");
-    } finally {
-      setLoading(false);
+      })),
+    };
+
+    try {
+        setLoading(true);
+
+        const token = localStorage.getItem("token"); 
+
+        if (!token) {
+          toast.error("User is not authenticated.");
+          return;
+        }
+
+        await templateService.assignSteps(payload, token); 
+
+        toast.success("Steps assigned successfully!");
+        setSelectedTemplate(null);
+        setTemplateDetails(null);
+        setAssignments({});
+      } catch (err) {
+        toast.error("Failed to assign steps");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     }
-  };
+
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-lg shadow p-8 mt-8">
       <h2 className="text-2xl font-bold mb-4">Assign Steps to Users</h2>
+
       <div className="mb-6">
         <label className="block font-medium mb-1">Select Template</label>
         <select
@@ -94,14 +110,18 @@ function AssignSteps() {
           value={selectedTemplate || ""}
           onChange={(e) => handleTemplateSelect(e.target.value)}
         >
-          <option value="">Select a template</option>
+          <option value="">-- Choose Template --</option>
           {templates.map((tpl) => (
-            <option key={tpl.id} value={tpl.id}>{tpl.title}</option>
+            <option key={tpl.id} value={tpl.id}>
+              {tpl.name}
+            </option>
           ))}
         </select>
       </div>
+
       {loading && <div>Loading...</div>}
-      {steps.length > 0 && !loading && (
+
+      {templateDetails?.steps?.length > 0 && !loading && (
         <div>
           <h3 className="text-lg font-semibold mb-2">Steps</h3>
           <table className="min-w-full text-sm mb-4">
@@ -113,16 +133,18 @@ function AssignSteps() {
               </tr>
             </thead>
             <tbody>
-              {steps.map((step) => (
+              {templateDetails.steps.map((step) => (
                 <tr key={step.id}>
-                  <td className="py-2 px-4">{step.name}</td>
+                  <td className="py-2 px-4">{step.stepName}</td>
                   <td className="py-2 px-4">
                     <select
                       className="input"
                       value={assignments[step.id]?.userId || ""}
-                      onChange={(e) => handleAssignmentChange(step.id, "userId", e.target.value)}
+                      onChange={(e) =>
+                        handleAssignmentChange(step.id, "userId", e.target.value)
+                      }
                     >
-                      <option value="">Select user</option>
+                      <option value="">-- Select User --</option>
                       {users.map((user) => (
                         <option key={user.id} value={user.id}>
                           {user.username} ({user.firstName} {user.lastName})
@@ -132,17 +154,23 @@ function AssignSteps() {
                   </td>
                   <td className="py-2 px-4">
                     <input
-                      className="input"
                       type="date"
+                      className="input"
                       value={assignments[step.id]?.dueDate || ""}
-                      onChange={(e) => handleAssignmentChange(step.id, "dueDate", e.target.value)}
+                      onChange={(e) =>
+                        handleAssignmentChange(step.id, "dueDate", e.target.value)
+                      }
                     />
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <button className="btn btn-primary" onClick={handleAssign} disabled={loading}>
+          <button
+            className="btn btn-primary"
+            onClick={handleAssign}
+            disabled={loading}
+          >
             Assign Steps
           </button>
         </div>
@@ -151,4 +179,4 @@ function AssignSteps() {
   );
 }
 
-export default AssignSteps; 
+export default AssignSteps;
