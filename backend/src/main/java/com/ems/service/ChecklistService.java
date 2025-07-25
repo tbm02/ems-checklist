@@ -1,7 +1,6 @@
 package com.ems.service;
 
-import com.ems.dto.AssignWorkflowRequest;
-import com.ems.dto.CreateWorkflowRequest;
+import com.ems.dto.*;
 import com.ems.entity.*;
 import com.ems.enums.StepStatus;
 import com.ems.repository.ChecklistTemplateRepository;
@@ -12,11 +11,20 @@ import com.ems.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ems.dto.WorkflowReportDTO;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.nio.file.*;
+
 
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 
 @Service
 public class ChecklistService {
@@ -135,6 +143,127 @@ public class ChecklistService {
         report.setSteps(steps);
 
         return report;
+    }
+
+    public List<EmployeeWorkflowDTO> getWorkflowsForUser(Long userId) {
+        List<ChecklistStepStatus> stepStatuses = checklistStepStatusRepository.findByAssignedToId(userId);
+
+        Set<ChecklistAssignment> assignments = stepStatuses.stream()
+                .map(ChecklistStepStatus::getAssignment)
+                .collect(Collectors.toSet());
+
+        return assignments.stream().map(assignment -> {
+            EmployeeWorkflowDTO dto = new EmployeeWorkflowDTO();
+            dto.setAssignmentId(assignment.getId());
+            dto.setWorkflowName(assignment.getTemplate().getName());
+            dto.setPriority(assignment.getTemplate().getPriority().name());
+            dto.setAssignedDate(assignment.getAssignedAt().toLocalDate());
+
+            List<EmployeeWorkflowDTO.StepDTO> steps = assignment.getStepStatuses().stream()
+                    .filter(status -> status.getAssignedTo().getId().equals(userId))
+                    .map(stepStatus -> {
+                        EmployeeWorkflowDTO.StepDTO stepDTO = new EmployeeWorkflowDTO.StepDTO();
+                        stepDTO.setStepId(stepStatus.getStep().getId());
+                        stepDTO.setStepName(stepStatus.getStep().getStepName());
+                        stepDTO.setStatus(stepStatus.getStatus().name());
+                        stepDTO.setDueDate(stepStatus.getDueDate());
+                        return stepDTO;
+                    }).toList();
+
+            dto.setSteps(steps);
+            return dto;
+        }).toList();
+    }
+
+
+    public UserWorkflowDetailsDTO getUserWorkflowDetails(Long assignmentId, Long userId) {
+        ChecklistAssignment assignment = checklistAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new RuntimeException("Assignment not found"));
+
+        List<ChecklistStepStatus> userSteps = assignment.getStepStatuses().stream()
+                .filter(step -> step.getAssignedTo().getId().equals(userId))
+                .toList();
+
+        List<UserWorkflowStepDTO> stepDTOs = userSteps.stream().map(step -> {
+            UserWorkflowStepDTO dto = new UserWorkflowStepDTO();
+            dto.setStepId(step.getId());
+            dto.setStepName(step.getStep().getStepName());
+            dto.setStatus(step.getStatus().name());
+            dto.setDueDate(step.getDueDate());
+            dto.setRemarks(step.getRemarks());
+            dto.setCompletedAt(step.getCompletedAt());
+            dto.setAttachmentPath(step.getAttachmentPath());
+            return dto;
+        }).toList();
+
+        UserWorkflowDetailsDTO response = new UserWorkflowDetailsDTO();
+        response.setAssignmentId(assignment.getId());
+        response.setWorkflowName(assignment.getTemplate().getName());
+        response.setAssignedDate(assignment.getAssignedAt().toLocalDate());
+        response.setPriority(assignment.getTemplate().getPriority().name());
+
+        response.setSteps(stepDTOs);
+
+        return response;
+    }
+
+    @Transactional
+    public void updateWorkflow(Long assignmentId, Long userId,
+                               Map<String, String> stepUpdates,
+                               Map<String, MultipartFile> files) {
+
+        ChecklistAssignment assignment = checklistAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new RuntimeException("Assignment not found"));
+
+        Set<Long> stepStatusIds = stepUpdates.keySet().stream()
+                .map(key -> key.replaceAll("\\D+", ""))  // Extract digits only
+                .map(Long::parseLong)
+                .collect(Collectors.toSet());
+
+        for (Long stepStatusId : stepStatusIds) {
+            ChecklistStepStatus stepStatus = checklistStepStatusRepository.findById(stepStatusId)
+                    .orElseThrow(() -> new RuntimeException("StepStatus not found"));
+
+            if (!stepStatus.getAssignedTo().getId().equals(userId)) {
+                throw new RuntimeException("You are not authorized to update this step");
+            }
+
+            // --- Remarks ---
+            String remarksKey = "stepUpdates[" + stepStatusId + "][remarks]";
+            String remarks = stepUpdates.get(remarksKey);
+            if (remarks != null) {
+                stepStatus.setRemarks(remarks);
+            }
+
+            // --- Status ---
+            String statusKey = "stepUpdates[" + stepStatusId + "][status]";
+            String status = stepUpdates.get(statusKey);
+            if ("COMPLETED".equals(status)) {
+                stepStatus.setStatus(StepStatus.COMPLETED);
+                stepStatus.setCompletedAt(LocalDateTime.now());
+            }
+
+            // --- File ---
+            String fileKey = "stepUpdates[" + stepStatusId + "][file]";
+            MultipartFile file = files.get(fileKey);
+            if (file != null && !file.isEmpty()) {
+                try {
+                    String folderPath = new File("uploads/attachments").getAbsolutePath();
+                    Files.createDirectories(Paths.get(folderPath));
+
+                    String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                    Path filePath = Paths.get(folderPath, filename);
+
+                    file.transferTo(filePath.toFile());
+                    stepStatus.setAttachmentPath(filePath.toString());
+
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to save attachment", e);
+                }
+            }
+
+            checklistStepStatusRepository.save(stepStatus);
+        }
     }
 
 

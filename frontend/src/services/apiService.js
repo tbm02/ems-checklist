@@ -39,6 +39,16 @@ export const userService = {
     getEmployee: (employeeId) => api.get(`/admin/employees/${employeeId}`),
     registerUser: (userData) => api.post('/admin/users/register', userData),
     changePassword: (passwordData) => api.put('/employee/change-password', passwordData),
+    getMyAssignments: () => api.get('/user/workflows', getAuthHeaders()),
+    getAssignmentDetails: (id) => api.get(`/user/workflows/${id}`, getAuthHeaders()),
+    updateWorkflow: (assignmentId, formData) => api.post(`/user/workflows/${assignmentId}/update`, 
+        formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+
+            },
+        }),
 }
 
 export const projectService = {

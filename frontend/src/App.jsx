@@ -15,6 +15,7 @@ import CreateTemplate from "./pages/admin/CreateTemplate";
 import AssignSteps from "./pages/admin/AssignSteps";
 import AdminWorkflowDashboard from "./components/AdminWorkflowDashboard";
 import WorkflowReport from "./pages/admin/WorkflowReport";
+import WorkflowDetails from "./components/WorkflowDetails";
 
 function App() {
   const { user, loading } = useAuth();
@@ -82,6 +83,8 @@ function App() {
               <Route path="employee/projects" element={<MyProjects />} />
               <Route path="employee/policies" element={<Policies />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="/workflow/:id" element={<WorkflowDetails />} />
+
             </>
           )}
         </Route>

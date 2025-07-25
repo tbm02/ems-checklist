@@ -8,5 +8,7 @@ import java.util.List;
 @Repository
 public interface ChecklistAssignmentRepository extends JpaRepository<ChecklistAssignment, Long> {
     List<ChecklistAssignment> findAll();
+    List<ChecklistAssignment> findByAssignedToId(Long userId);
+
 
 }
